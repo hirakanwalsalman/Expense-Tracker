@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Personal Expense Tracker</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-icon" aria-label="Expense tracker icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 2.75a9.25 9.25 0 1 1 0 18.5 9.25 9.25 0 0 1 0-18.5Zm.75 4.5h-1.5v5.2l4.05 2.43.75-1.3-3.3-1.93V7.25Z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="eyebrow">Overview</p>
+            <h1>Expense Tracker</h1>
+          </div>
+        </div>
+
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+          <span class="theme-toggle-icon">🌙</span>
+          <span class="theme-toggle-text">Dark</span>
+        </button>
+      </header>
+
+      <main class="dashboard">
+        <section class="panel form-panel">
+          <div class="panel-heading">
+            <h2>Add Expense</h2>
+          </div>
+
+          <form id="expense-form" class="expense-form" novalidate>
+            <label>
+              <span>Expense title</span>
+              <input type="text" id="title" name="title" placeholder="Groceries" />
+              <small class="field-error" id="title-error" aria-live="polite"></small>
+            </label>
+
+            <label>
+              <span>Amount</span>
+              <input type="number" id="amount" name="amount" min="0" step="0.01" placeholder="0.00" />
+              <small class="field-error" id="amount-error" aria-live="polite"></small>
+            </label>
+
+            <label>
+              <span>Category</span>
+              <select id="category" name="category">
+                <option value="Food">Food</option>
+                <option value="Transport">Transport</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Bills">Bills</option>
+                <option value="Health">Health</option>
+                <option value="Other">Other</option>
+              </select>
+            </label>
+
+            <label class="checkbox-row" for="recurring">
+              <input type="checkbox" id="recurring" name="recurring" />
+              <span>Mark as recurring</span>
+            </label>
+
+            <button type="submit" class="primary-btn">Add Expense</button>
+            <p id="form-message" class="form-message" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <aside class="panel summary-panel">
+          <div class="panel-heading">
+            <h2>Summary</h2>
+          </div>
+
+          <div class="summary-card">
+            <p class="summary-label">Total Expenses</p>
+            <p class="summary-value" id="total-expenses">$0.00</p>
+          </div>
+
+          <div class="breakdown-card">
+            <h3>Category breakdown</h3>
+            <div id="category-breakdown" class="category-breakdown"></div>
+          </div>
+
+          <div class="chart-card">
+            <h3>Spending mix</h3>
+            <div class="donut-wrap">
+              <div id="donut-chart" class="donut-chart" aria-label="Expense distribution chart"></div>
+            </div>
+            <div id="chart-bars" class="chart-bars"></div>
+          </div>
+
+          <div class="budget-card">
+            <div class="panel-subhead">
+              <h3>Monthly budget</h3>
+              <button type="button" class="ghost-btn" id="reset-budget">Reset</button>
+            </div>
+
+            <label class="budget-input-label">
+              <span>Set monthly budget</span>
+              <div class="budget-input-wrap">
+                <span class="currency-prefix">$</span>
+                <input type="number" id="monthly-budget" min="0" step="0.01" placeholder="2500" />
+              </div>
+            </label>
+
+            <div class="budget-stats">
+              <div>
+                <span>Spent</span>
+                <strong id="spent-this-month">$0.00</strong>
+              </div>
+              <div>
+                <span>Left</span>
+                <strong id="remaining-budget">$0.00</strong>
+              </div>
+            </div>
+          </div>
+
+          <label class="filter-group">
+            <span>Filter by category</span>
+            <select id="category-filter">
+              <option value="All">All</option>
+              <option value="Food">Food</option>
+              <option value="Transport">Transport</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Bills">Bills</option>
+              <option value="Health">Health</option>
+              <option value="Other">Other</option>
+            </select>
+          </label>
+
+          <label class="filter-group date-filter-group">
+            <span>View period</span>
+            <select id="date-filter">
+              <option value="all">All time</option>
+              <option value="30">Last 30 days</option>
+              <option value="month">This month</option>
+              <option value="last-month">Last month</option>
+            </select>
+          </label>
+
+          <button type="button" class="secondary-btn" id="export-csv">Export CSV</button>
+        </aside>
+      </main>
+
+      <section class="panel recent-panel">
+        <div class="panel-heading">
+          <h2>Recent Expenses</h2>
+        </div>
+        <div id="recent-expenses" class="recent-expenses"></div>
+      </section>
+
+      <section class="panel list-panel">
+        <div class="panel-header-row">
+          <div class="panel-heading">
+            <h2>Expenses</h2>
+          </div>
+
+          <label class="search-box" aria-label="Search expenses">
+            <span class="sr-only">Search</span>
+            <input type="search" id="expense-search" placeholder="Search by title or category" />
+          </label>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Recurring</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="expense-list">
+              <tr class="empty-row">
+                <td colspan="5">No expenses yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
